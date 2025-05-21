@@ -1,0 +1,67 @@
+[gd_scene load_steps=6 format=3 uid="uid://b64l03k3y52g3"]
+
+[sub_resource type="GDScript" id="GDScript_gci8f"]
+script/source = "extends Node2D
+
+@export var num : int = 1
+@onready var warp_sensor: Area2D = $WarpSensor
+@onready var reset_sensor: Area2D = $ResetSensor
+@onready var collision_shape_2d: CollisionShape2D = $WarpSensor/CollisionShape2D
+
+var partner_portal
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	find_partner()
+	
+func find_partner() -> void:
+	var portals = get_tree().get_nodes_in_group(\"portal\")
+	partner_portal = portals.filter(func(portal) : return portal.get_parent().num == num and portal.get_parent() != self)
+
+func _on_reset_sensor_area_exited(area: Area2D) -> void:
+	collision_shape_2d.set_deferred(\"disabled\", false)
+
+func _on_warp_sensor_body_entered(body: Node2D) -> void:
+	partner_portal[0].get_child(0).set_deferred(\"disabled\", true)
+	body.global_position = partner_portal[0].global_position
+"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_gci8f"]
+radius = 6.0
+height = 14.0
+
+[sub_resource type="Gradient" id="Gradient_gci8f"]
+offsets = PackedFloat32Array(0.624424, 0.631336, 0.686636, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_0r486"]
+gradient = SubResource("Gradient_gci8f")
+width = 20
+height = 30
+fill = 1
+fill_from = Vector2(0.5, 0.487179)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0r486"]
+radius = 12.0
+
+[node name="Node2D" type="Node2D"]
+script = SubResource("GDScript_gci8f")
+
+[node name="WarpSensor" type="Area2D" parent="." groups=["portal"]]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WarpSensor"]
+shape = SubResource("CapsuleShape2D_gci8f")
+
+[node name="Sprite2D" type="Sprite2D" parent="WarpSensor"]
+texture = SubResource("GradientTexture2D_0r486")
+
+[node name="ResetSensor" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ResetSensor"]
+shape = SubResource("CircleShape2D_0r486")
+
+[connection signal="body_entered" from="WarpSensor" to="." method="_on_warp_sensor_body_entered"]
+[connection signal="area_exited" from="ResetSensor" to="." method="_on_reset_sensor_area_exited"]

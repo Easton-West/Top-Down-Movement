@@ -1,0 +1,10 @@
+[gd_resource type="AnimationNodeBlendTree" load_steps=2 format=3 uid="uid://cc52072o41i24"]
+
+[ext_resource type="AnimationNodeStateMachine" uid="uid://c787qb8pkxdb7" path="res://character_body_2d.tres" id="1_wi22r"]
+
+[resource]
+graph_offset = Vector2(-907.295, 13.3161)
+nodes/AnimationNodeStateMachine/node = ExtResource("1_wi22r")
+nodes/AnimationNodeStateMachine/position = Vector2(-580, 140)
+nodes/output/position = Vector2(300, 140)
+node_connections = [&"output", 0, &"AnimationNodeStateMachine"]
